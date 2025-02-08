@@ -3,8 +3,9 @@ import generateToken from "../utils/generateToken.js";
 // import getDataUrl from "../utils/uriGenerator.js";
 import bcrypt from "bcrypt";
 // import cloudinary from "cloudinary";
+import TryCatch from "../utils/TryCatch.js";
 
-const register = async (req, res) => {
+const register = TryCatch(async (req, res) => {
     try {
         const { name, email, password, gender } = req.body;
         // const file = req.file;
@@ -45,8 +46,40 @@ const register = async (req, res) => {
             user
         });
     } catch (error) {
-        res.status(400).json({ message: 'i cannot create user' });
+        res.status(400).json({ message: error.message });
     }
-};
+});
 
-export default register;
+const login = TryCatch(async (req, res) => {
+    const {email , password} = req.body;
+
+    const user = await User.findOne({email});
+    if(!user){
+        return res.status(400).json({message: "No User with this email"});
+    }
+
+    // This return bool value true or false
+    const comparePassword = await bcrypt.compare(password, user.password);
+    if(!comparePassword){
+        return res.status(400).json({message: "Invalid Password"});
+    }
+
+    generateToken(user._id, res);
+
+    res.status(200).json({
+        message: "User logged in successfully",
+        user
+    });
+
+});
+
+const logout = TryCatch(async (req, res) => {
+    res.cookie("token","",{maxAge: 0});
+
+    res.json({
+        message: "Logged out successfully"
+    });
+
+});
+
+export default { register, login , logout};
