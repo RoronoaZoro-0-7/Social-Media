@@ -1,16 +1,19 @@
 import User from "../models/userModels.js";
 import generateToken from "../utils/generateToken.js";
-// import getDataUrl from "../utils/uriGenerator.js";
+import getDataUrl from "../utils/urlGenerator.js";
 import bcrypt from "bcrypt";
-// import cloudinary from "cloudinary";
+import cloudinary from "cloudinary";
 import TryCatch from "../utils/TryCatch.js";
 
 const register = TryCatch(async (req, res) => {
     try {
-        const { name, email, password, gender } = req.body;
-        // const file = req.file;
+        const {name, email, password, gender } = req.body;
+        console.log(req.body);
+        
+        const  file = req.file;
+        console.log(file);
 
-        if (!name || !email || !password || !gender /* || !file */) {
+        if (!name || !email || !password || !gender || !file) {
             return res.status(400).json({ message: "All fields are required" });
         }
 
@@ -19,20 +22,20 @@ const register = TryCatch(async (req, res) => {
             return res.status(400).json({ message: "User already exists" });
         }
 
-        // const fileUrl = getDataUrl(file);
+        const fileUrl = getDataUrl(file);
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // const myCloud = await cloudinary.v2.uploader.upload(fileUrl.content);
+        const myCloud = await cloudinary.v2.uploader.upload(fileUrl.content);
 
         user = await User.create({
             name,
             email,
             password: hashedPassword,
             gender,
-            // profilePic: {
-            //     id: myCloud.public_id,
-            //     url: myCloud.secure_url
-            // }
+            profilePic: {
+                id: myCloud.public_id,
+                url: myCloud.secure_url
+            }
         });
 
         if (!user) {
@@ -53,12 +56,12 @@ const register = TryCatch(async (req, res) => {
 const login = TryCatch(async (req, res) => {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email }).select("-password"); // Excludes password
+    const user = await User.findOne({ email }).select("-password"); 
     if (!user) {
         return res.status(400).json({ message: "No User with this email" });
     }
 
-    const storedUser = await User.findOne({ email }); // Fetch again to compare password
+    const storedUser = await User.findOne({ email }); 
     const comparePassword = await bcrypt.compare(password, storedUser.password);
     if (!comparePassword) {
         return res.status(400).json({ message: "Invalid Password" });
@@ -72,14 +75,12 @@ const login = TryCatch(async (req, res) => {
     });
 });
 
-
 const logout = TryCatch(async (req, res) => {
-    res.cookie("token","",{maxAge: 0});
+    res.cookie("token", "", { maxAge: 0 });
 
     res.json({
         message: "Logged out successfully"
     });
-
 });
 
-export default { register, login , logout};
+export default { register, login, logout };

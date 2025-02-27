@@ -6,8 +6,8 @@ const { register, login ,logout} = authController;
 
 const router = express.Router();
 
-router.post("/register",register);
-// router.post("/register", uploadFile ,register);
+// router.post("/register",register);
+router.post("/register", uploadFile ,register);
 
 router.post("/login", login);
 router.get("/logout", logout);
