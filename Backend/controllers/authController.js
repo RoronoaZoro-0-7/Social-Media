@@ -51,17 +51,17 @@ const register = TryCatch(async (req, res) => {
 });
 
 const login = TryCatch(async (req, res) => {
-    const {email , password} = req.body;
+    const { email, password } = req.body;
 
-    const user = await User.findOne({email});
-    if(!user){
-        return res.status(400).json({message: "No User with this email"});
+    const user = await User.findOne({ email }).select("-password"); // Excludes password
+    if (!user) {
+        return res.status(400).json({ message: "No User with this email" });
     }
 
-    // This return bool value true or false
-    const comparePassword = await bcrypt.compare(password, user.password);
-    if(!comparePassword){
-        return res.status(400).json({message: "Invalid Password"});
+    const storedUser = await User.findOne({ email }); // Fetch again to compare password
+    const comparePassword = await bcrypt.compare(password, storedUser.password);
+    if (!comparePassword) {
+        return res.status(400).json({ message: "Invalid Password" });
     }
 
     generateToken(user._id, res);
@@ -70,8 +70,8 @@ const login = TryCatch(async (req, res) => {
         message: "User logged in successfully",
         user
     });
-
 });
+
 
 const logout = TryCatch(async (req, res) => {
     res.cookie("token","",{maxAge: 0});
