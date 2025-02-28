@@ -65,12 +65,12 @@ const deletePost = TryCatch(async (req, res) => {
 });
 
 const getAllPosts = TryCatch(async (req, res) => {
-    const post = await Post.find({type: "post",owner:req.user._id})
-    .sort({createdAt: -1})
-    .populate("owner");
+    const post = await Post.find({ type: "post", owner: req.user._id })
+        .sort({ createdAt: -1 })
+        .populate("owner", "-password");
     // const post = await Post.find({type: "post"})
     // .sort({createdAt: -1})
-    // .populate("owner");
+    // .populate("owner","-password");
     if (!post) {
         return res.status(400).json({ message: "No Post found" });
     }
@@ -79,4 +79,89 @@ const getAllPosts = TryCatch(async (req, res) => {
     })
 })
 
-export default { newPost, deletePost, getAllPosts };
+const likeUnlikePost = TryCatch(async (req, res) => {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+        return res.status(404).json({ message: "Post not found" });
+    }
+    const isLiked = post.likes.includes(req.user._id);
+    if (isLiked) {
+        post.likes = post.likes.filter((id) => { return id.toString() !== req.user._id.toString() });
+        await post.save();
+        return res.status(200).json({
+            message: "Unliked the Post"
+        })
+    }
+    post.likes.push(req.user._id);
+    await post.save();
+    return res.status(200).json({
+        message: "Liked the Post"
+    })
+})
+
+const commentOnPost = TryCatch(async (req, res) => {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+        return res.status(400).json({
+            message: "Post Not Found"
+        })
+    }
+    post.comments.push({
+        user: req.user._id,
+        name: req.user.name,
+        comment: req.body.comment
+    })
+    await post.save();
+    res.status(200).json({
+        message: "Comment Added to post",
+        data: post
+    })
+})
+
+const deleteComment = TryCatch(async (req, res) => {
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+        return res.status(400).json({ message: "Post Not Found" });
+    }
+
+    const commentId = req.body.commentId;
+    if (!commentId) {
+        return res.status(400).json({ message: "Send the commentId" });
+    }
+
+    const commentIndex = post.comments.findIndex(comment => comment._id.toString() === commentId);
+
+    if (commentIndex === -1) {
+        return res.status(404).json({ message: "Comment Not Found" });
+    }
+
+    post.comments.splice(commentIndex, 1);
+    await post.save();
+
+    res.status(200).json({ message: "Comment Deleted Successfully" });
+});
+
+const editCaption = TryCatch(async (req, res) => {
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+        return res.status(400).json({ message: "Post Not Found" });
+    }
+
+    if (post.owner.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    if(!req.body.caption){
+        return res.status(400).json({ message: "Caption is required" });
+    }
+
+    post.caption = req.body.caption;
+    await post.save();
+
+    res.status(200).json({ message: "Caption Updated Successfully" ,data:post});
+
+})
+
+export default { newPost, deletePost, getAllPosts, likeUnlikePost, commentOnPost, deleteComment, editCaption };
