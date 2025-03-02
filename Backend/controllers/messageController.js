@@ -70,14 +70,24 @@ const getAllMessages = TryCatch(async (req, res) => {
 
 const getAllChats = TryCatch(async (req, res) => {
     const userId = req.user._id;
+    try {
+        const chats = await Chat.find({ users: userId })
+            .populate({
+                path: "users",
+                select: "name profilePic"
+            });
 
-    const chats = await Chat.find({ users: userId })
-    .populate({
-        path:"users",
-        select:"name profilePic"
-    });
+        chats.forEach((e) => {
+            e.users = e.users.filter((user) => {
+                user._id.toString() !== userId.toString();
+            })
+        })
 
-    return res.status(200).json({ chats });
+        return res.status(200).json({ chats });
+    }
+    catch (err) {
+        return res.status(400).json({ message: err.message });
+    }
 });
 
 export default { sendMessage, getAllMessages, getAllChats };

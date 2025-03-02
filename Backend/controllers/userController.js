@@ -25,31 +25,27 @@ const followandunfollowUser = TryCatch(async (req, res) => {
     const loggedInUser = await User.findById(req.user._id);
 
     if (!user) {
-        return res.status(404).json({
-            message: "User not found"
-        });
+        return res.status(404).json({ message: "User not found" });
     }
 
-    if (user._id.toString() === loggedInUser._id.toString()) {
-        return res.status(400).json({
-            message: "You cannot follow yourself"
-        });
+    if (user._id.equals(loggedInUser._id)) {
+        return res.status(400).json({ message: "You cannot follow yourself" });
     }
 
-    if (user.followers.includes(loggedInUser._id.toString())) {
-        const indexFollowing = loggedInUser.following.indexOf(user._id.toString());
-        const indexFollower = user.followers.indexOf(loggedInUser._id.toString());
+    const loggedInUserId = loggedInUser._id.toString();
+    const userId = user._id.toString();
 
-        loggedInUser.following.splice(indexFollowing, 1);
-        user.followers.splice(indexFollower, 1);
+    if (user.followers.includes(loggedInUserId)) {
+        user.followers = user.followers.filter(id => id.toString() !== loggedInUserId);
+        loggedInUser.following = loggedInUser.following.filter(id => id.toString() !== userId);
 
         await user.save();
         await loggedInUser.save();
 
         return res.status(200).json({ message: "User unfollowed successfully" });
     } else {
-        loggedInUser.following.push(user._id);
         user.followers.push(loggedInUser._id);
+        loggedInUser.following.push(user._id);
 
         await user.save();
         await loggedInUser.save();
@@ -79,15 +75,15 @@ const updateProfile = TryCatch(async (req, res) => {
     if (req.body.name) {
         user.name = req.body.name;
     }
-    
+
     const file = req.file;
-    if(file){
+    if (file) {
         const fileURL = getDataUrl(file);
-        
-        if(user.profilePic.id){
+
+        if (user.profilePic.id) {
             await cloudinary.v2.uploader.destroy(user.profilePic.id);
         }
-        
+
         const myCLoud = await cloudinary.v2.uploader.upload(fileURL.content);
         user.profilePic.id = myCLoud.public_id;
         user.profilePic.url = myCLoud.secure_url;
@@ -124,4 +120,19 @@ const updatePassword = TryCatch(async (req, res) => {
     res.status(200).json({ message: "Password updated successfully" });
 })
 
-export default { myProfile, userProfile, followandunfollowUser, userFollowerandFollowingData, updateProfile, updatePassword };
+const allUsers = TryCatch(async (req, res) => {
+    try {
+        const search = req.query.search || "";
+        const user = await User.find({
+            name: {
+                $regex: search,
+                $options: "i"
+            }
+        }).select("-password");
+        return res.status(200).json({ user });
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
+})
+
+export default { myProfile, userProfile, followandunfollowUser, userFollowerandFollowingData, updateProfile, updatePassword, allUsers };

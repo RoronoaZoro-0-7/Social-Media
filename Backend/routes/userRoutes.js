@@ -7,10 +7,12 @@ const router = express.Router();
 
 router.get("/me", isAuth, profile.myProfile);
 router.get("/:id", isAuth, profile.userProfile);
-// router.post("/:id", isAuth, profile.updatePassword);
-router.put("/:id", isAuth, profile.updateProfile);
-router.put("/:id", isAuth , uploadFile , profile.updateProfile);
+router.post("/:id", isAuth, profile.updatePassword);
+router.get("/all/profiles", isAuth, profile.allUsers);
+// router.put("/:id", isAuth, profile.updateProfile);
+router.put("/:id", isAuth, uploadFile, profile.updateProfile);
 router.put("/follow/:id", isAuth, profile.followandunfollowUser);
 router.post("/followdata/:id", isAuth, profile.userFollowerandFollowingData);
+
 
 export default router;
