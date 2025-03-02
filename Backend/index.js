@@ -4,6 +4,7 @@ import mongoose from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import postRoutes from './routes/postRoutes.js';
+import messageRoutes from './routes/messageRoute.js';
 import cloudinary from 'cloudinary';
 import cookieParser from 'cookie-parser';
 
@@ -22,6 +23,7 @@ app.use(cookieParser());
 app.use("/api/user", userRoutes);
 app.use("/api/auth",authRoutes);
 app.use("/api/post",postRoutes);
+app.use("/api/message",messageRoutes);
 
 app.get("/", (req, res) => {
     res.send("Hello World");
