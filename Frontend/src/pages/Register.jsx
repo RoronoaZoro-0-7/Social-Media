@@ -14,6 +14,18 @@ const Register = () => {
     console.log(name, email, password, gender, file);
   }
 
+  const changeFileHandler = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+
+    reader.onloadend = () => {
+      setFile(file);
+      setFilePrev(reader.result);
+    }
+  }
+
   return (
     <div className="flex justify-center">
       <div className="flex flex-col justify-center items-center md:flex-row shadow-md rounded-xl max-w-7xl w-[90%] md:w-[50%] md:mt-[40px]">
@@ -25,7 +37,8 @@ const Register = () => {
           </div>
           <form onSubmit={submitHandler}>
             <div className="flex flex-col justify-center items-center m-2 space-y-6 md:space-y-8">
-              <input type="file" className="custom-input" required />
+              {filePrev && <img src={filePrev} alt="preview" className="w-20 h-20 rounded-full" />}
+              <input type="file" className="custom-input" onChange={changeFileHandler} accept="image/*" required />
               <input type="text" className="custom-input" value={name} onChange={(e) => setName(e.target.value)} placeholder="User Name" required />
               <input type="email" className="custom-input" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="User Email" required />
               <input type="password" className="custom-input" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />

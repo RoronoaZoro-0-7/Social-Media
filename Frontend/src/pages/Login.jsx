@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -20,13 +21,21 @@ const Login = () => {
               </h1>
             </div>
             <form onSubmit={submitHandler}>
-            <div className="flex flex-col justify-center items-center m-2 space-y-6 md:space-y-8">
-              <input type="email" className="custom-input" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="User Email" required />
-              <input type="password" className="custom-input" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
-              <button type="submit" className="auth-btn">Login</button>
-              {/* <Link to="/register" className="auth-btn">Register</Link> */}
-            </div>
+              <div className="flex flex-col justify-center items-center m-2 space-y-6 md:space-y-8">
+                <input type="email" className="custom-input" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="User Email" required />
+                <input type="password" className="custom-input" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
+                <button type="submit" className="auth-btn">Login</button>
+                {/* <Link to="/register" className="auth-btn">Register</Link> */}
+              </div>
             </form>
+          </div>
+          <div className="h-full w-full md:w-1/3 bg-gradient-to-l from-blue-400 to-yellow-400 flex items-center justify-center">
+            <div className="text-white text-base font-semibold text-center my-10 space-y-2 m-2">
+              <h1 className="text-5xl">Don't have Account?</h1>
+              <h1>Register to Social Media</h1>
+              <Link to="/register" className="bg-white rounded-2xl px-4 text-emerald-400">Register</Link>
+
+            </div>
           </div>
         </div>
       </div>
