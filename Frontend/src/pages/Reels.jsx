@@ -1,12 +1,12 @@
 import React from 'react'
 import AddPost from '../components/AddPost'
 
-const Home = () => {
+const Reels = () => {
   return (
     <div>
-      <AddPost type="post"/>
+        <AddPost type="reel"></AddPost>
     </div>
   )
 }
 
-export default Home
+export default Reels
