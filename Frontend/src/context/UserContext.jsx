@@ -1,18 +1,20 @@
+import React, { createContext, useContext } from "react";
 import axios from "axios";
-import { createContext, useContext } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 const UserContext = createContext();
 
 export const UserContextProvider = ({ children }) => {
     async function loginUser(email, password, navigate) {
         try {
-            const { data } = await axios.post("http://localhost:3000/api/authlogin", { email, password, navigate });
-            toast.success(data.message);
-            navigate("/");
-        }
-        catch (err) {
-            toast.error("error.response.data.message");
+            const { data } = await axios.post("http://localhost:3000/api/auth/login", { email, password });
+            const { msg, user } = data;
+            toast.success(data);
+            console.log(user);
+            navigate("/login");
+        } catch (err) {
+            toast.error(err.response?.data?.message || "Login failed. Please try again.");
+            console.log(err.response?.data || err.message);
         }
     }
     return (
@@ -22,4 +24,4 @@ export const UserContextProvider = ({ children }) => {
     );
 };
 
-export const useUserData = () => useContext(UserContext);   
+export const UserData = () => useContext(UserContext);
