@@ -6,14 +6,14 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  const { loginUser } = UserData();
+  const { loginUser ,loading} = UserData();
 
   const submitHandler = (e) => {
     e.preventDefault();
     console.log(email, password);
     loginUser(email,password,navigate);
   }
-  return (
+  return loading? (<h1>Loading..</h1>):(
     <div>
 
       <div className="flex justify-center">
