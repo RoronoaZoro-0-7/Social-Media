@@ -7,10 +7,10 @@ import TryCatch from "../utils/TryCatch.js";
 
 const register = TryCatch(async (req, res) => {
     try {
-        const {name, email, password, gender } = req.body;
+        const { name, email, password, gender } = req.body;
         console.log(req.body);
-        
-        const  file = req.file;
+
+        const file = req.file;
         console.log(file);
 
         if (!name || !email || !password || !gender || !file) {
@@ -56,12 +56,12 @@ const register = TryCatch(async (req, res) => {
 const login = TryCatch(async (req, res) => {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email }).select("-password"); 
+    const user = await User.findOne({ email }).select("-password");
     if (!user) {
         return res.status(400).json({ message: "No User with this email" });
     }
 
-    const storedUser = await User.findOne({ email }); 
+    const storedUser = await User.findOne({ email });
     const comparePassword = await bcrypt.compare(password, storedUser.password);
     if (!comparePassword) {
         return res.status(400).json({ message: "Invalid Password" });

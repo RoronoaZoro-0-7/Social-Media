@@ -10,10 +10,7 @@ const NotFound = () => {
                 <div className="text-5xl font-medium">Page not found</div>
                 <div className="text-gray-500">sorry, this page isn't available</div>
                 <div className="flex items-center justify-center">
-                    <div
-                        onClick={() => navigate("/")}
-                        className="bg-gray-600 px-4 py-1 text-white font-medium rounded-lg hover:scale-105 cursor-pointer"
-                    >
+                    <div onClick={() => navigate("/")} className="bg-gray-600 px-4 py-1 text-white font-medium rounded-lg hover:scale-105 cursor-pointer">
                         Visit Homepage
                     </div>
                 </div>
