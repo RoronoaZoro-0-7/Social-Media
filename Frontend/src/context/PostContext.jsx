@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import React from 'react';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const PostContext = createContext();
 
@@ -13,13 +14,29 @@ export const PostContextProvider = ({ children }) => {
             const { data } = await axios.get('http://localhost:3000/api/post/all', {
                 withCredentials: true
             });
-            if (Array.isArray(data.data)) {
-                const allPosts = data.data;
-                setPosts(allPosts.filter(post => post.type === "post"));
-                setReels(allPosts.filter(post => post.type === "reel")); // Assuming "reel" is the type for reels
-            }
+            const allPosts = data.data;
+            const allposts = data.data;
+            setPosts(allPosts.filter(post => post.type === "post"));
+            setReels(allposts.filter(post => post.type === "reel"));
         } catch (error) {
             console.log(error);
+        }
+    }
+
+    async function addPost(formData, setFile, setFilePrev, setCaption, type) {
+        try {
+            const { data } = await axios.post('http://localhost:3000/api/post/new?type=' + type, formData, {
+                withCredentials: true
+            })
+            toast.success(data.message);
+            setFile('');
+            setFilePrev('');
+            setCaption('');
+            fetchPosts();
+        } catch (error) {
+            toast.error(err.response?.data?.message || "Login failed. Please try again.");
+            console.log(error.response?.data || error.message);
+            
         }
     }
 
@@ -33,7 +50,7 @@ export const PostContextProvider = ({ children }) => {
     }, [posts, reels]);
 
     return (
-        <PostContext.Provider value={{ posts, reels }}>
+        <PostContext.Provider value={{ posts, reels, addPost }}>
             {children}
         </PostContext.Provider>
     );

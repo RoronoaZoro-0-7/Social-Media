@@ -1,10 +1,21 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { BsChatFill, BsThreeDotsVertical } from 'react-icons/bs'
 import { IoHeartSharp, IoHeartOutline } from 'react-icons/io5'
+import { UserData } from '../context/UserContext'
 
 const PostCard = ({ type, value }) => {
   const [isLike, setIsLike] = useState(false)
   const [show, setShow] = useState(false)
+  const {user} = UserData();
+
+  useEffect(() => {
+    for(let i = 0;i<value.likes.length;i++){
+      if(value.likes[i] === user._id){
+        setIsLike(true);
+        break;
+      }
+    }
+  },[value,user._id])
 
   return (
     <div className="bg-gray-100 flex items-center justify-center pt-3 pb-14">
@@ -30,7 +41,7 @@ const PostCard = ({ type, value }) => {
             <img
               src={value.post.url}
               alt="post"
-              className="w-full h-48 object-cover rounded-md"
+              className="w-[450px] h-[600px] object-cover rounded-md"
             />
           ) : (
             <video
