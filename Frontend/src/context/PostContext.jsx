@@ -5,6 +5,24 @@ import toast from 'react-hot-toast';
 
 const PostContext = createContext();
 
+const showToast = (msg) => {
+    toast(msg, {
+        position: "top-right",
+        autoClose: 2400,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "dark",
+        style: {
+            border: '1px solid #4ade80',
+            padding: '16px',
+            color: '#166534',
+            backgroundColor: '#dcfce7',
+        },
+    });
+};
+
 export const PostContextProvider = ({ children }) => {
     const [posts, setPosts] = useState([]);
     const [reels, setReels] = useState([]);
@@ -15,29 +33,61 @@ export const PostContextProvider = ({ children }) => {
                 withCredentials: true
             });
             const allPosts = data.data;
-            const allposts = data.data;
             setPosts(allPosts.filter(post => post.type === "post"));
-            setReels(allposts.filter(post => post.type === "reel"));
+            setReels(allPosts.filter(post => post.type === "reel"));
         } catch (error) {
             console.log(error);
         }
     }
 
-    async function addPost(formData, setFile, setFilePrev, setCaption, type) {
+    async function likePost(id) {
+        let msg;
         try {
-            const { data } = await axios.post('http://localhost:3000/api/post/new?type=' + type, formData, {
+            const { data } = await axios.post("http://localhost:3000/api/post/like/" + id, {}, {
+                withCredentials: true
+            });
+            msg = data.message;
+            fetchPosts();
+        } catch (err) {
+            msg = err.response?.data?.message || "Like failed. Please try again.";
+        }
+        showToast(msg);
+    }
+
+    async function addComment(id, comment, setComment, setShow) {
+        let msg;
+        try {
+            const { data } = await axios.post('http://localhost:3000/api/post/comment/' + id, { comment }, {
                 withCredentials: true
             })
-            toast.success(data.message);
+            msg = "Comment added (placeholder)";
+            setComment('');
+            setShow(false);
+            fetchPosts();
+        } catch (error) {
+            msg = error.response?.data?.message || "Adding comment failed.";
+        }
+        showToast(msg);
+    }
+
+    async function addPost(formData, setFile, setFilePrev, setCaption, type) {
+        let msg;
+        try {
+            const { data } = await axios.post(
+                'http://localhost:3000/api/post/new?type=' + type,
+                formData,
+                { withCredentials: true }
+            );
+            msg = data.message;
             setFile('');
             setFilePrev('');
             setCaption('');
             fetchPosts();
         } catch (error) {
-            toast.error(err.response?.data?.message || "Login failed. Please try again.");
+            msg = error.response?.data?.message || "Adding post failed.";
             console.log(error.response?.data || error.message);
-            
         }
+        showToast(msg);
     }
 
     useEffect(() => {
@@ -50,7 +100,7 @@ export const PostContextProvider = ({ children }) => {
     }, [posts, reels]);
 
     return (
-        <PostContext.Provider value={{ posts, reels, addPost }}>
+        <PostContext.Provider value={{ posts, reels, addPost, likePost, addComment }}>
             {children}
         </PostContext.Provider>
     );
