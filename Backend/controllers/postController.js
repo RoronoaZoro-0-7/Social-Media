@@ -65,9 +65,13 @@ const deletePost = TryCatch(async (req, res) => {
 });
 
 const getAllPosts = TryCatch(async (req, res) => {
-    const post = await Post.find({owner: req.user._id })
+    const post = await Post.find()
         .sort({ createdAt: -1 })
-        .populate("owner", "-password");
+        .populate("owner", "-password")
+        .populate({
+            path: "comments.user",
+            select: "-password"
+        });
     if (!post) {
         return res.status(400).json({ message: "No Post found" });
     }
