@@ -26,6 +26,7 @@ const showToast = (msg) => {
 export const PostContextProvider = ({ children }) => {
     const [posts, setPosts] = useState([]);
     const [reels, setReels] = useState([]);
+    const [addLoading, setAddLoading] = useState(false);
 
     async function fetchPosts() {
         try {
@@ -72,6 +73,7 @@ export const PostContextProvider = ({ children }) => {
 
     async function addPost(formData, setFile, setFilePrev, setCaption, type) {
         let msg;
+        setAddLoading(true);
         try {
             const { data } = await axios.post(
                 'http://localhost:3000/api/post/new?type=' + type,
@@ -87,6 +89,7 @@ export const PostContextProvider = ({ children }) => {
             msg = error.response?.data?.message || "Adding post failed.";
             console.log(error.response?.data || error.message);
         }
+        setAddLoading(false);
         showToast(msg);
     }
 
@@ -100,7 +103,7 @@ export const PostContextProvider = ({ children }) => {
     }, [posts, reels]);
 
     return (
-        <PostContext.Provider value={{ posts, reels, addPost, likePost, addComment }}>
+        <PostContext.Provider value={{ posts, reels, addPost, likePost, addComment, addLoading }}>
             {children}
         </PostContext.Provider>
     );

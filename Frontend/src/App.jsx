@@ -9,12 +9,13 @@ import NavigationBar from './components/NavigationBar';
 import NotFound from './components/NotFound.jsx';
 import Reels from './pages/Reels.jsx';
 import { Toaster } from 'react-hot-toast';
+import { Loading } from './pages/Loading.jsx';
 
 const App = () => {
   const { loading, isAuth, user } = UserData();
   return (<>
     <Toaster />
-    {loading ? <h1>Loading</h1> : <BrowserRouter>
+    {loading ? <Loading /> : <BrowserRouter>
       <Routes>
         <Route path="/" element={isAuth ? <Home /> : <Login />} />
         <Route path="/reels" element={isAuth ? <Reels /> : <Login />} />
