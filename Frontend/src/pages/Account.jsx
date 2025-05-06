@@ -1,14 +1,17 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserData } from '../context/UserContext';
 import { PostData } from '../context/PostContext';
 import PostCard from '../components/PostCard';
+import Modal from '../components/Modal';
 
 const Account = ({ user }) => {
     const navigate = useNavigate();
     const { logoutUser } = UserData();
     const { posts, reels } = PostData();
     const [showPosts, setShowPosts] = useState(true);
+    const [showFollowers, setShowFollowers] = useState(false);
+    const [showFollowing, setShowFollowing] = useState(false);
 
     const myPosts = posts?.filter(post => post.owner._id === user._id) || [];
     const myReels = reels?.filter(reel => reel.owner._id === user._id) || [];
@@ -29,14 +32,21 @@ const Account = ({ user }) => {
                             <p className="text-gray-800 font-semibold">{user.name}</p>
                             <p className="text-gray-500 text-sm">{user.email}</p>
                             <p className="text-gray-500 text-sm">{user.gender}</p>
-                            <p className="text-gray-500 text-sm">{user.followers.length} follower</p>
-                            <p className="text-gray-500 text-sm">{user.following.length} following</p>
+                            <p className="text-gray-500 text-sm">
+                                <button onClick={() => setShowFollowers(true)} className="underline hover:text-blue-600">
+                                    {user.followers.length} follower
+                                </button>
+                            </p>
+                            <p className="text-gray-500 text-sm">
+                                <button onClick={() => setShowFollowing(true)} className="underline hover:text-blue-600">
+                                    {user.following.length} following
+                                </button>
+                            </p>
                             <button
                                 onClick={logoutHandler}
                                 className="bg-red-500 hover:bg-green-600 text-white font-semibold rounded-full px-5 py-2 shadow-md transition duration-100 ease-in-out transform hover:scale-105">
                                 Logout
                             </button>
-
                         </div>
                     </div>
 
@@ -65,6 +75,22 @@ const Account = ({ user }) => {
                             : <p>No Reels Yet</p>
                     )}
                 </div>
+            )}
+
+            {showFollowers && (
+                <Modal
+                    value={user.followers}
+                    title="Followers"
+                    setShow={() => setShowFollowers(false)}
+                />
+            )}
+
+            {showFollowing && (
+                <Modal
+                    value={user.following}
+                    title="Following"
+                    setShow={() => setShowFollowing(false)}
+                />
             )}
         </>
     );
