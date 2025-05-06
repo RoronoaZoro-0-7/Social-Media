@@ -10,7 +10,7 @@ export const UserContextProvider = ({ children }) => {
     const [isAuth, setIsAuth] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    async function registerUser(formData, navigate) {
+    async function registerUser(formData, navigate, fetchPosts) {
         setLoading(true);
         try {
             const { data } = await axios.post("http://localhost:3000/api/auth/register", formData, {
@@ -21,14 +21,15 @@ export const UserContextProvider = ({ children }) => {
             setUser(data.user);
             setLoading(false);
             navigate("/");
+            fetchPosts();
         } catch (err) {
             setLoading(false);
-            toast.error(err.response?.data?.message || "Login failed. Please try again.");
+            toast.error(err.response?.data?.message || "Registration failed. Please try again.");
             console.log(err.response?.data || err.message);
         }
     }
 
-    async function loginUser(email, password, navigate) {
+    async function loginUser(email, password, navigate, fetchPosts) {
         setLoading(true);
         try {
             const { data } = await axios.post("http://localhost:3000/api/auth/login",
@@ -39,7 +40,7 @@ export const UserContextProvider = ({ children }) => {
             setIsAuth(true);
             setUser(user);
             setLoading(false);
-            navigate("/login");
+            fetchPosts();
         } catch (err) {
             toast.error(err.response?.data?.message || "Login failed. Please try again.");
             console.log(err.response?.data || err.message);

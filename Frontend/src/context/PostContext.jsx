@@ -93,6 +93,19 @@ export const PostContextProvider = ({ children }) => {
         showToast(msg);
     }
 
+    async function deletePost(id) {
+        try {
+            const { data } = await axios.delete("http://localhost:3000/api/post/" + id, {
+                withCredentials: true
+            });
+            fetchPosts();
+            showToast("Deleted the post");
+        } catch (error) {
+            console.log(error);
+            showToast("Encountered some error");
+        }
+    }
+
     useEffect(() => {
         fetchPosts();
     }, []);
@@ -103,7 +116,7 @@ export const PostContextProvider = ({ children }) => {
     }, [posts, reels]);
 
     return (
-        <PostContext.Provider value={{ posts, reels, addPost, likePost, addComment, addLoading }}>
+        <PostContext.Provider value={{ fetchPosts, posts, reels, addPost, likePost, addComment, addLoading, deletePost }}>
             {children}
         </PostContext.Provider>
     );

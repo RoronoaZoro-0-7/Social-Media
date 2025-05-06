@@ -6,15 +6,16 @@ import { PostData } from '../context/PostContext'
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
 import { MdDelete } from "react-icons/md";
+import SimpleModal from './SimpleModal'
 
 const PostCard = ({ type, value }) => {
   const [isLike, setIsLike] = useState(false)
   const [show, setShow] = useState(false)
   const { user } = UserData();
   const [comment, setComment] = useState('');
-  const { likePost, addComment } = PostData();
+  const { likePost, addComment, deletePost } = PostData();
   const formatDate = format(new Date(value.createdAt), 'MMMM dd, yyyy');
-
+  const [showModal, setShowModal] = useState(false);
   useEffect(() => {
     for (let i = 0; i < value.likes.length; i++) {
       if (value.likes[i] === user._id) {
@@ -34,11 +35,30 @@ const PostCard = ({ type, value }) => {
     addComment(value._id, comment, setComment, setShow);
   }
 
+  const closeModal = () => {
+    setShowModal(false);
+  }
+
+  const deleteHandler = () => {
+    deletePost(value._id);
+    setShowModal(false);
+  }
+
+  const editHandler = () => {
+    setShowModal(false);
+  }
+
   return (
     <div className="bg-gray-100 flex items-center justify-center pt-3 pb-14">
+      <SimpleModal isOpen={showModal} onClose={closeModal}>
+        <div className="flex flex-col gap-2 items-center justify-center">
+          <button onClick={editHandler} className='bg-blue-400 text-white py-1 px-3 rounded-md'>Edit</button>
+          <button onClick={deleteHandler} className='bg-red-400 text-white py-1 px-3 rounded-md'>Delete</button>
+        </div>
+      </SimpleModal>
       <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
         <div className="flex items-center space-x-2">
-          <Link to={`/profile/${value.owner._id}`}>
+          <Link to={`/user/${value.owner._id}`}>
             <img src={value.owner?.profilePic?.url} alt="profile" className="w-8 h-8 rounded-full" />
           </Link>
           <div>
@@ -48,7 +68,7 @@ const PostCard = ({ type, value }) => {
             </Link>
           </div>
           {value.owner._id === user._id && <div className="ml-auto text-gray-500 cursor-pointer">
-            <button className="hover:bg-gray-500 rounded-full p-1 text-2xl">
+            <button onClick={() => setShowModal(true)} className="hover:bg-gray-500 rounded-full p-1 text-2xl">
               <BsThreeDotsVertical />
             </button>
           </div>}

@@ -1,20 +1,43 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserData } from '../context/UserContext';
 import { PostData } from '../context/PostContext';
 import PostCard from '../components/PostCard';
 import Modal from '../components/Modal';
+import axios from 'axios';
 
 const Account = ({ user }) => {
     const navigate = useNavigate();
-    const { logoutUser } = UserData();
+    const { logoutUser } = UserData(); // assuming allUsers is available
     const { posts, reels } = PostData();
+
     const [showPosts, setShowPosts] = useState(true);
     const [showFollowers, setShowFollowers] = useState(false);
     const [showFollowing, setShowFollowing] = useState(false);
 
     const myPosts = posts?.filter(post => post.owner._id === user._id) || [];
     const myReels = reels?.filter(reel => reel.owner._id === user._id) || [];
+
+    const [followersData, setFollowersData] = useState([]);
+    const [followingData, setFollowingData] = useState([]);
+
+    async function followData() {
+        try {
+            const { data } = await axios.post('http://localhost:3000/api/user/followdata/' + user._id, {}, {
+                withCredentials: true
+            });
+            console.log(data);
+            
+            setFollowersData(data.followers);
+            setFollowingData(data.following);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    useEffect(() => {
+        followData();
+    }, [user._id]);
 
     const logoutHandler = () => {
         logoutUser(navigate);
@@ -33,12 +56,12 @@ const Account = ({ user }) => {
                             <p className="text-gray-500 text-sm">{user.email}</p>
                             <p className="text-gray-500 text-sm">{user.gender}</p>
                             <p className="text-gray-500 text-sm">
-                                <button onClick={() => setShowFollowers(true)} className="underline hover:text-blue-600">
+                                <button onClick={() => setShowFollowers(true)} className="hover:text-blue-600">
                                     {user.followers.length} follower
                                 </button>
                             </p>
                             <p className="text-gray-500 text-sm">
-                                <button onClick={() => setShowFollowing(true)} className="underline hover:text-blue-600">
+                                <button onClick={() => setShowFollowing(true)} className="hover:text-blue-600">
                                     {user.following.length} following
                                 </button>
                             </p>
@@ -79,7 +102,7 @@ const Account = ({ user }) => {
 
             {showFollowers && (
                 <Modal
-                    value={user.followers}
+                    value={followersData}
                     title="Followers"
                     setShow={() => setShowFollowers(false)}
                 />
@@ -87,7 +110,7 @@ const Account = ({ user }) => {
 
             {showFollowing && (
                 <Modal
-                    value={user.following}
+                    value={followingData}
                     title="Following"
                     setShow={() => setShowFollowing(false)}
                 />
