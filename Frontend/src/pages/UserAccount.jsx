@@ -5,8 +5,9 @@ import { UserData } from '../context/UserContext';
 import { PostData } from '../context/PostContext';
 import PostCard from '../components/PostCard';
 import { RiUserUnfollowFill, RiUserFollowLine } from "react-icons/ri";
-{/* <RiUserFollowFill />
-<RiUserFollowLine /> */}
+import toast from 'react-hot-toast';
+import Modal from '../components/Modal';
+
 const UserAccount = ({ user: loggedInUser }) => {
     const navigate = useNavigate();
     const [showPosts, setShowPosts] = useState(true);
@@ -14,6 +15,11 @@ const UserAccount = ({ user: loggedInUser }) => {
     const { posts, reels } = PostData();
     const [user, setUser] = useState({});
     const params = useParams();
+
+    const [followersData, setFollowersData] = useState([]);
+    const [followingData, setFollowingData] = useState([]);
+    const [showFollowersModal, setShowFollowersModal] = useState(false);
+    const [showFollowingModal, setShowFollowingModal] = useState(false);
 
     async function fetchUser() {
         try {
@@ -29,13 +35,13 @@ const UserAccount = ({ user: loggedInUser }) => {
         }
     }
 
-    async function handleFollowToggler() {
+    async function followData() {
         try {
-            const { data } = await axios.put("http://localhost:3000/api/user/follow/" + params.id, {}, {
+            const { data } = await axios.post('http://localhost:3000/api/user/followdata/' + params.id, {}, {
                 withCredentials: true
-            })
-            setFollowed(!followed);
-            fetchUser();
+            });
+            setFollowersData(data.followers);
+            setFollowingData(data.following);
         } catch (error) {
             console.log(error);
         }
@@ -43,11 +49,44 @@ const UserAccount = ({ user: loggedInUser }) => {
 
     useEffect(() => {
         fetchUser();
-        console.log("account", user);
+        followData();
     }, [params.id]);
+
+    async function handleFollowToggler() {
+        try {
+            const { data } = await axios.put("http://localhost:3000/api/user/follow/" + params.id, {}, {
+                withCredentials: true
+            });
+            setFollowed(!followed);
+            fetchUser();
+            showToast(followed ? "Unfollowed the account!" : "Followed the account!");
+        } catch (error) {
+            console.log(error);
+            showToast("Something went wrong. Please try again.");
+        }
+    }
+
+    const showToast = (msg) => {
+        toast(msg, {
+            position: "top-right",
+            autoClose: 2400,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "dark",
+            style: {
+                border: '1px solid #4ade80',
+                padding: '16px',
+                color: '#166534',
+                backgroundColor: '#dcfce7',
+            },
+        });
+    };
 
     const myPosts = posts?.filter(post => post.owner?._id === user?._id) || [];
     const myReels = reels?.filter(reel => reel.owner?._id === user?._id) || [];
+
     return (
         <>
             {user && user._id && (
@@ -60,15 +99,24 @@ const UserAccount = ({ user: loggedInUser }) => {
                             <p className="text-gray-800 font-semibold">{user.name}</p>
                             <p className="text-gray-500 text-sm">{user.email}</p>
                             <p className="text-gray-500 text-sm">{user.gender}</p>
-                            <p className="text-gray-500 text-sm">{user.followers?.length} follower</p>
-                            <p className="text-gray-500 text-sm">{user.following?.length} following</p>
-                            { user._id !== loggedInUser._id && <button onClick={handleFollowToggler} className="bg-blue-500 text-white rounded-full px-5 py-2 hover:scale-105 hover:bg-gray-500 flex items-center gap-2">
-                                {followed ? (
-                                    <><RiUserUnfollowFill />Unfollow</>
-                                ) : (
-                                    <><RiUserFollowLine />Follow</>
-                                )}
-                            </button>}
+
+                            <p className="text-gray-500 text-sm cursor-pointer" onClick={() => setShowFollowersModal(true)}>
+                                {followersData.length} follower{followersData.length !== 1 ? 's' : ''}
+                            </p>
+
+                            <p className="text-gray-500 text-sm cursor-pointer" onClick={() => setShowFollowingModal(true)}>
+                                {followingData.length} following
+                            </p>
+
+                            {user._id !== loggedInUser._id && (
+                                <button onClick={handleFollowToggler} className="bg-blue-500 text-white rounded-full px-5 py-2 hover:scale-105 hover:bg-gray-500 flex items-center gap-2">
+                                    {followed ? (
+                                        <><RiUserUnfollowFill />Unfollow</>
+                                    ) : (
+                                        <><RiUserFollowLine />Follow</>
+                                    )}
+                                </button>
+                            )}
                         </div>
                     </div>
 
@@ -97,6 +145,22 @@ const UserAccount = ({ user: loggedInUser }) => {
                             : <p>No Reels Yet</p>
                     )}
                 </div>
+            )}
+
+            {showFollowersModal && (
+                <Modal
+                    title="Followers"
+                    value={followersData}
+                    setShow={() => setShowFollowersModal(false)}
+                />
+            )}
+
+            {showFollowingModal && (
+                <Modal
+                    title="Following"
+                    value={followingData}
+                    setShow={() => setShowFollowingModal(false)}
+                />
             )}
         </>
     );
