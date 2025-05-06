@@ -13,9 +13,11 @@ const PostCard = ({ type, value }) => {
   const [show, setShow] = useState(false)
   const { user } = UserData();
   const [comment, setComment] = useState('');
-  const { likePost, addComment, deletePost } = PostData();
+  const { likePost, addComment, deletePost, deleteComment, editPost } = PostData();
   const formatDate = format(new Date(value.createdAt), 'MMMM dd, yyyy');
   const [showModal, setShowModal] = useState(false);
+  const [showInput, setShowInput] = useState(false);
+  const [caption, setCaption] = useState(value.caption);
   useEffect(() => {
     for (let i = 0; i < value.likes.length; i++) {
       if (value.likes[i] === user._id) {
@@ -46,6 +48,17 @@ const PostCard = ({ type, value }) => {
 
   const editHandler = () => {
     setShowModal(false);
+    setShowInput(true);
+  }
+
+  const commentHandler = () => {
+    setShowInput(false);
+    editPost(value._id, caption);
+  }
+
+  const deleteCommentHandler = (id) => {
+    deleteComment(value._id, id);
+    setShowModal(false);
   }
 
   return (
@@ -75,7 +88,28 @@ const PostCard = ({ type, value }) => {
         </div>
 
         <div className="my-4">
-          <p className="text-gray-800">{value.caption || 'No Caption'}</p>
+          {
+            showInput ? (
+              <>
+                <input
+                  type="text"
+                  className="custom-input border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  style={{ width: "150px" }}
+                  placeholder="Enter caption"
+                  value={caption}
+                  onChange={(e) => setCaption(e.target.value)}
+                  required />
+                <div className="flex gap-2 mt-2">
+                  <button className="bg-blue-600 text-white text-sm px-3 py-1 rounded-md hover:bg-blue-700 transition duration-200" onClick={commentHandler}>
+                    Update
+                  </button>
+                  <button className="bg-red-500 text-white text-sm px-3 py-1 rounded-md hover:bg-red-600 transition duration-200" onClick={() => setShowInput(false)}>
+                    Cancel
+                  </button>
+                </div></>
+            ) : (
+              <p className="text-gray-800">{value.caption || 'No Caption'}</p>
+            )}
         </div>
 
         <div className="mb-4">
@@ -130,7 +164,7 @@ const PostCard = ({ type, value }) => {
         <div className="mt-4 max-h-[100px] overflow-y-auto">
           {value.comments && value.comments.length > 0 ? (
             value.comments.map((comment) => (
-              <Comment key={comment._id} value={comment} name={comment.name} text={comment.comment} user={user} />
+              <Comment key={comment._id} value={comment} name={comment.name} text={comment.comment} user={user} deleteCommentHandler={deleteCommentHandler} />
             ))
           ) : (
             <p className="text-sm text-gray-500">No comments yet</p>
@@ -141,7 +175,7 @@ const PostCard = ({ type, value }) => {
   )
 }
 
-export const Comment = ({ name, text, value, user }) => {
+export const Comment = ({ name, text, value, user, deleteCommentHandler }) => {
   return (
 
     <div className="flex items-center space-x-2 mt-2">
@@ -154,7 +188,7 @@ export const Comment = ({ name, text, value, user }) => {
       </div>
       {
         user._id === value.user._id && <div className="ml-auto text-gray-500 cursor-pointer">
-          <button className="hover:bg-gray-500 rounded-full p-1 text-2xl">
+          <button onClick={() => deleteCommentHandler(value._id)} className="hover:bg-gray-500 rounded-full p-1 text-2xl">
             <MdDelete />
           </button>
         </div>

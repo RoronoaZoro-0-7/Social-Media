@@ -43,8 +43,7 @@ const newPost = TryCatch(async (req, res) => {
 const deletePost = TryCatch(async (req, res) => {
     console.log(req.params.id);
     const post = await Post.findById(req.params.id.toString());
-    console.log(post);
-
+    
     if (!post) {
         return res.status(400).json({ message: "No post with this ID" });
     }
