@@ -4,12 +4,14 @@ import axios from 'axios';
 import { UserData } from '../context/UserContext';
 import { PostData } from '../context/PostContext';
 import PostCard from '../components/PostCard';
-
+import { RiUserUnfollowFill, RiUserFollowLine } from "react-icons/ri";
+{/* <RiUserFollowFill />
+<RiUserFollowLine /> */}
 const UserAccount = ({ user: loggedInUser }) => {
     const navigate = useNavigate();
-    const { logoutUser } = UserData();
-    const { posts, reels } = PostData();
     const [showPosts, setShowPosts] = useState(true);
+    const [followed, setFollowed] = useState(false);
+    const { posts, reels } = PostData();
     const [user, setUser] = useState({});
     const params = useParams();
 
@@ -19,6 +21,21 @@ const UserAccount = ({ user: loggedInUser }) => {
                 withCredentials: true
             });
             setUser(data);
+            if (data.followers.includes(loggedInUser._id)) {
+                setFollowed(true);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async function handleFollowToggler() {
+        try {
+            const { data } = await axios.put("http://localhost:3000/api/user/follow/" + params.id, {}, {
+                withCredentials: true
+            })
+            setFollowed(!followed);
+            fetchUser();
         } catch (error) {
             console.log(error);
         }
@@ -26,7 +43,7 @@ const UserAccount = ({ user: loggedInUser }) => {
 
     useEffect(() => {
         fetchUser();
-        console.log(user);
+        console.log("account", user);
     }, [params.id]);
 
     const myPosts = posts?.filter(post => post.owner?._id === user?._id) || [];
@@ -45,6 +62,13 @@ const UserAccount = ({ user: loggedInUser }) => {
                             <p className="text-gray-500 text-sm">{user.gender}</p>
                             <p className="text-gray-500 text-sm">{user.followers?.length} follower</p>
                             <p className="text-gray-500 text-sm">{user.following?.length} following</p>
+                            { user._id !== loggedInUser._id && <button onClick={handleFollowToggler} className="bg-blue-500 text-white rounded-full px-5 py-2 hover:scale-105 hover:bg-gray-500 flex items-center gap-2">
+                                {followed ? (
+                                    <><RiUserUnfollowFill />Unfollow</>
+                                ) : (
+                                    <><RiUserFollowLine />Follow</>
+                                )}
+                            </button>}
                         </div>
                     </div>
 
