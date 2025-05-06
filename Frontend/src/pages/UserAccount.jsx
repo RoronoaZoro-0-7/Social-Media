@@ -1,42 +1,50 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
 import { UserData } from '../context/UserContext';
 import { PostData } from '../context/PostContext';
 import PostCard from '../components/PostCard';
 
-const Account = ({ user }) => {
+const UserAccount = ({ user: loggedInUser }) => {
     const navigate = useNavigate();
     const { logoutUser } = UserData();
     const { posts, reels } = PostData();
     const [showPosts, setShowPosts] = useState(true);
+    const [user, setUser] = useState({});
+    const params = useParams();
 
-    const myPosts = posts?.filter(post => post.owner._id === user._id) || [];
-    const myReels = reels?.filter(reel => reel.owner._id === user._id) || [];
+    async function fetchUser() {
+        try {
+            const { data } = await axios.get(`http://localhost:3000/api/user/${params.id}`, {
+                withCredentials: true
+            });
+            setUser(data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
-    const logoutHandler = () => {
-        logoutUser(navigate);
-    };
+    useEffect(() => {
+        fetchUser();
+        console.log(user);
+    }, [params.id]);
 
+    const myPosts = posts?.filter(post => post.owner?._id === user?._id) || [];
+    const myReels = reels?.filter(reel => reel.owner?._id === user?._id) || [];
     return (
         <>
-            {user && (
+            {user && user._id && (
                 <div className="bg-gray-100 min-h-screen flex flex-col gap-4 items-center justify-center pt-3 pb-14">
                     <div className="flex justify-center bg-white p-8 rounded-lg shadow-md max-w-md">
                         <div className="image flex flex-col justify-between mb-4 gap-4">
-                            <img src={user.profilePic.url} alt="" className="w-[180px] h-[180px] rounded-full" />
+                            <img src={user.profilePic?.url} alt="" className="w-[180px] h-[180px] rounded-full" />
                         </div>
                         <div className="flex flex-col gap-2">
                             <p className="text-gray-800 font-semibold">{user.name}</p>
                             <p className="text-gray-500 text-sm">{user.email}</p>
                             <p className="text-gray-500 text-sm">{user.gender}</p>
-                            <p className="text-gray-500 text-sm">{user.followers.length} follower</p>
-                            <p className="text-gray-500 text-sm">{user.following.length} following</p>
-                            <button
-                                onClick={logoutHandler}
-                                className="bg-red-500 hover:bg-green-600 text-white font-semibold rounded-full px-5 py-2 shadow-md transition duration-100 ease-in-out transform hover:scale-105">
-                                Logout
-                            </button>
-
+                            <p className="text-gray-500 text-sm">{user.followers?.length} follower</p>
+                            <p className="text-gray-500 text-sm">{user.following?.length} following</p>
                         </div>
                     </div>
 
@@ -70,4 +78,4 @@ const Account = ({ user }) => {
     );
 };
 
-export default Account;
+export default UserAccount;
