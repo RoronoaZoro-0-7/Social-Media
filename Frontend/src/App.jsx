@@ -9,8 +9,9 @@ import NavigationBar from './components/NavigationBar';
 import NotFound from './components/NotFound.jsx';
 import UserAccount from './pages/UserAccount.jsx';
 import Reels from './pages/Reels.jsx';
-import { Toaster } from 'react-hot-toast';
 import { Loading } from './pages/Loading.jsx';
+import Search from './pages/Search.jsx';
+import { Toaster } from 'react-hot-toast';
 
 const App = () => {
   const { loading, isAuth, user } = UserData();
@@ -24,6 +25,7 @@ const App = () => {
         <Route path="/user/:id" element={isAuth ? <UserAccount user={user} /> : <Login />}></Route>
         <Route path="/login" element={isAuth ? <Home /> : <Login />} />
         <Route path="/register" element={isAuth ? <Home /> : <Register />} />
+        <Route path="/search" element={isAuth ? <Search /> : <Login />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       {isAuth && <NavigationBar />}
