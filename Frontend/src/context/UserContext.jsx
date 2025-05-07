@@ -5,6 +5,24 @@ import { useEffect } from "react";
 
 const UserContext = createContext();
 
+const showToast = (msg) => {
+    toast(msg, {
+        position: "top-right",
+        autoClose: 2400,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "dark",
+        style: {
+            border: '1px solid #4ade80',
+            padding: '16px',
+            color: '#166534',
+            backgroundColor: '#dcfce7',
+        },
+    });
+};
+
 export const UserContextProvider = ({ children }) => {
     const [user, setUser] = useState({});
     const [isAuth, setIsAuth] = useState(false);
@@ -20,12 +38,12 @@ export const UserContextProvider = ({ children }) => {
             setIsAuth(true);
             setUser(data.user);
             setLoading(false);
+            showToast("New User Registered Successfully.");
             navigate("/");
             fetchPosts();
         } catch (err) {
             setLoading(false);
-            toast.error(err.response?.data?.message || "Registration failed. Please try again.");
-            console.log(err.response?.data || err.message);
+            showToast("Registration failed. Please try again.");
         }
     }
 
@@ -40,10 +58,17 @@ export const UserContextProvider = ({ children }) => {
             setIsAuth(true);
             setUser(user);
             setLoading(false);
+            showToast("User Logged In Successfully.");
             fetchPosts();
         } catch (err) {
-            toast.error(err.response?.data?.message || "Login failed. Please try again.");
+            showToast("Login failed. Please try again.");
             console.log(err.response?.data || err.message);
+            try {
+                sleep(2000);
+            } catch (error) {
+                showToast("Login failed. Please try again.");
+            }
+            navigate("/login");
         }
     }
 
@@ -57,10 +82,11 @@ export const UserContextProvider = ({ children }) => {
                 setUser({});
                 setIsAuth(false);
                 setLoading(false);
+                showToast("User Logged Out Successfully.");
                 navigate('/login');
             }
         } catch (error) {
-            toast.error(err.response?.data?.message || "Logout failed. Please try again.");
+            showToast("Logout failed. Please try again.");
         }
     }
 
@@ -86,10 +112,38 @@ export const UserContextProvider = ({ children }) => {
         }
     }
 
+    async function updateUser(id, fromData, setFile) {
+        try {
+            const { data } = await axios.put('http://localhost:3000/api/user/' + id, fromData, {
+                withCredentials: true
+            })
+            setUser(data.user);
+            showToast("Updated Profile Details");
+        } catch (error) {
+            showToast("Encountered some error.");
+        }
+        setFile('');
+    }
+
+    async function updatePwd(id, payload, setOldPwd, setNewPwd, setShowPwd) {
+        try {
+            const { data } = await axios.post(`http://localhost:3000/api/user/${id}`, payload, {
+                withCredentials: true
+            });
+            showToast("Updated Password");
+            setOldPwd('');
+            setNewPwd('');
+            setShowPwd(false);
+        } catch (error) {
+            console.log(error.response?.data || error);
+            showToast("Encountered some error.");
+        }
+    }
+
     return (
         <UserContext.Provider value={{
             loginUser, isAuth, setIsAuth, user, setUser, loading, setLoading, logoutUser,
-            registerUser
+            registerUser, updateUser, updatePwd
         }}>
             {children}
         </UserContext.Provider>
