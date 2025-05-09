@@ -9,8 +9,9 @@ import NavigationBar from './components/NavigationBar';
 import NotFound from './components/NotFound.jsx';
 import UserAccount from './pages/UserAccount.jsx';
 import Reels from './pages/Reels.jsx';
-import { Loading } from './pages/Loading.jsx';
 import Search from './pages/Search.jsx';
+import ChatPage from './pages/ChatPage.jsx';
+import { Loading } from './pages/Loading.jsx';
 import { Toaster } from 'react-hot-toast';
 
 const App = () => {
@@ -26,6 +27,7 @@ const App = () => {
         <Route path="/login" element={isAuth ? <Home /> : <Login />} />
         <Route path="/register" element={isAuth ? <Home /> : <Register />} />
         <Route path="/search" element={isAuth ? <Search /> : <Login />} />
+        <Route path="/chat" element={isAuth ? <ChatPage user={user} /> : <Login />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       {isAuth && <NavigationBar />}
