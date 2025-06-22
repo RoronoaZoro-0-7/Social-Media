@@ -8,6 +8,8 @@ import cloudinary from 'cloudinary';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import db from './config/db.js';
+import http from 'http';
+import { Server as SocketIOServer } from 'socket.io';
 
 cloudinary.config({
     cloud_name: process.env.Cloudinary_Cloud_Name,
@@ -27,10 +29,45 @@ app.use("/api/auth", authRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/message", messageRoutes);
 
+const server = http.createServer(app);
+const io = new SocketIOServer(server, {
+    cors: {
+        origin: "http://localhost:5173",
+        methods: ["GET", "POST"],
+        credentials: true
+    }
+});
+
+io.on('connection', (socket) => {
+    console.log('A user connected:', socket.id);
+
+    // User joins a room with their user ID
+    socket.on('join', (userId) => {
+        socket.join(userId);
+        console.log(`User ${userId} joined their room`);
+    });
+    
+    socket.on('send_message', (data) => {
+        // Emit to recipient
+        if (data.receiverId) {
+            io.to(data.receiverId).emit('receive_message', data);
+        }
+        // Emit to sender for instant feedback
+        if (data.sender) {
+            io.to(data.sender).emit('receive_message', data);
+        }
+    });
+
+    socket.on('disconnect', () => {
+        console.log('User disconnected:', socket.id);
+    });
+});
+
 app.get("/", (req, res) => {
     res.send("Hello World");
 });
 
-app.listen(process.env.PORT, () => {
-    console.log('Server is running on port 3000');
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });

@@ -9,10 +9,9 @@ import NavigationBar from './components/NavigationBar';
 import NotFound from './components/NotFound.jsx';
 import UserAccount from './pages/UserAccount.jsx';
 import Reels from './pages/Reels.jsx';
-import Search from './pages/Search.jsx';
 import ChatPage from './pages/ChatPage.jsx';
-import { Loading } from './pages/Loading.jsx';
 import { Toaster } from 'react-hot-toast';
+import { Loading } from './pages/Loading.jsx';
 
 const App = () => {
   const { loading, isAuth, user } = UserData();
@@ -22,12 +21,12 @@ const App = () => {
       <Routes>
         <Route path="/" element={isAuth ? <Home /> : <Login />} />
         <Route path="/reels" element={isAuth ? <Reels /> : <Login />} />
+        <Route path="/chat" element={isAuth ? <ChatPage /> : <Login />} />
         <Route path="/account" element={isAuth ? <Account user={user} /> : <Login />} />
         <Route path="/user/:id" element={isAuth ? <UserAccount user={user} /> : <Login />}></Route>
         <Route path="/login" element={isAuth ? <Home /> : <Login />} />
         <Route path="/register" element={isAuth ? <Home /> : <Register />} />
-        <Route path="/search" element={isAuth ? <Search /> : <Login />} />
-        <Route path="/chat" element={isAuth ? <ChatPage user={user} /> : <Login />} />
+        <Route path="/chat" element={isAuth ? <ChatPage /> : <Login />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       {isAuth && <NavigationBar />}
