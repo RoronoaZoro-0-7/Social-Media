@@ -13,6 +13,7 @@ router.get("/all/profiles", isAuth, profile.allUsers);
 router.put("/:id", isAuth, uploadFile, profile.updateProfile);
 router.put("/follow/:id", isAuth, profile.followandunfollowUser);
 router.post("/followdata/:id", isAuth, profile.userFollowerandFollowingData);
+// so completed now
 
 
 export default router;
