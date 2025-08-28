@@ -135,4 +135,14 @@ const allUsers = TryCatch(async (req, res) => {
     }
 })
 
+const deleteUser = TryCatch(async (req, res) => {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+        return res.status(404).json({ message: "User not found" });
+    }
+
+    await user.remove();
+    res.status(200).json({ message: "User deleted successfully" });
+});
+
 export default { myProfile, userProfile, followandunfollowUser, userFollowerandFollowingData, updateProfile, updatePassword, allUsers };
