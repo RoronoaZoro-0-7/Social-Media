@@ -32,7 +32,7 @@ app.use("/api/message", messageRoutes);
 const server = http.createServer(app);
 const io = new SocketIOServer(server, {
     cors: {
-        origin: "http://localhost:5173",
+        origin: "https://social-media-nu-two.vercel.app/",
         methods: ["GET", "POST"],
         credentials: true
     }
