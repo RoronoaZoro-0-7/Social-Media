@@ -9,7 +9,7 @@ const Search = () => {
   async function fetchUsers() {
     try {
       const { data } = await axios.get(
-        "http://localhost:3000/api/user/all/profiles?search=" + search,
+        `${import.meta.env.VITE_API_URL}/api/user/all/profiles?search=${search}`,
         {
           withCredentials: true,
         }

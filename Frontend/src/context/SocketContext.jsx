@@ -9,7 +9,7 @@ export const SocketProvider = ({ children }) => {
     const { user } = UserData();
 
     useEffect(() => {
-        const newSocket = io('http://localhost:3000', {
+        const newSocket = io(import.meta.env.VITE_API_URL, {
             withCredentials: true,
         });
         setSocket(newSocket);

@@ -31,7 +31,7 @@ export const UserContextProvider = ({ children }) => {
     async function registerUser(formData, navigate, fetchPosts) {
         setLoading(true);
         try {
-            const { data } = await axios.post("http://localhost:3000/api/auth/register", formData, {
+            const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/register`, formData, {
                 withCredentials: true
             })
             toast.success(data.message);
@@ -50,7 +50,7 @@ export const UserContextProvider = ({ children }) => {
     async function loginUser(email, password, navigate, fetchPosts) {
         setLoading(true);
         try {
-            const { data } = await axios.post("http://localhost:3000/api/auth/login",
+            const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login`,
                 { email, password },
                 { withCredentials: true });
             const { message, user } = data;
@@ -74,7 +74,7 @@ export const UserContextProvider = ({ children }) => {
 
     async function logoutUser(navigate) {
         try {
-            const { data } = await axios.get('http://localhost:3000/api/auth/logout', {
+            const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/logout`, {
                 withCredentials: true
             });
             if (data.message) {
@@ -99,7 +99,7 @@ export const UserContextProvider = ({ children }) => {
 
     async function fetchUser() {
         try {
-            const { data } = await axios.get("http://localhost:3000/api/user/me", {
+            const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/me`, {
                 withCredentials: true
             });
             setUser(data.user);
@@ -114,7 +114,7 @@ export const UserContextProvider = ({ children }) => {
 
     async function updateUser(id, fromData, setFile) {
         try {
-            const { data } = await axios.put('http://localhost:3000/api/user/' + id, fromData, {
+            const { data } = await axios.put(`${import.meta.env.VITE_API_URL}/api/user/${id}`, fromData, {
                 withCredentials: true
             })
             setUser(data.user);
@@ -127,7 +127,7 @@ export const UserContextProvider = ({ children }) => {
 
     async function updatePwd(id, payload, setOldPwd, setNewPwd, setShowPwd) {
         try {
-            const { data } = await axios.post(`http://localhost:3000/api/user/${id}`, payload, {
+            const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/api/user/${id}`, payload, {
                 withCredentials: true
             });
             showToast("Updated Password");

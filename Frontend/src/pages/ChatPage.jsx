@@ -27,7 +27,7 @@ const ChatPage = () => {
   useEffect(() => {
     const fetchChats = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/message/all/chats', {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/message/all/chats`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
           withCredentials: true
         });
@@ -48,7 +48,7 @@ const ChatPage = () => {
       if (!selectedChat) return;
       
       try {
-        const response = await axios.get(`http://localhost:3000/api/message/${selectedChat._id}`, {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/message/${selectedChat._id}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
           withCredentials: true
         });
@@ -98,7 +98,7 @@ const ChatPage = () => {
     }
 
     try {
-      const response = await axios.get(`http://localhost:3000/api/user/all/profiles?search=${searchQuery}`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/all/profiles?search=${searchQuery}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         withCredentials: true
       });
@@ -129,7 +129,7 @@ const ChatPage = () => {
     };
     try {
       socket.emit('send_message', messageObj);
-      await axios.post('http://localhost:3000/api/message', {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/message`, {
         receiverId: selectedChat._id,
         message: newMessage
       }, {
@@ -146,7 +146,7 @@ const ChatPage = () => {
   // Start new chat
   const startChat = async (otherUser) => {
     try {
-      const response = await axios.post('http://localhost:3000/api/message/start-chat', {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/message/start-chat`, {
         recipientId: otherUser._id
       }, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },

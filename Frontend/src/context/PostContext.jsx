@@ -30,7 +30,7 @@ export const PostContextProvider = ({ children }) => {
 
     async function fetchPosts() {
         try {
-            const { data } = await axios.get('http://localhost:3000/api/post/all', {
+            const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/post/all`, {
                 withCredentials: true
             });
             const allPosts = data.data;
@@ -44,7 +44,7 @@ export const PostContextProvider = ({ children }) => {
     async function likePost(id) {
         let msg;
         try {
-            const { data } = await axios.post("http://localhost:3000/api/post/like/" + id, {}, {
+            const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/api/post/like/${id}`, {}, {
                 withCredentials: true
             });
             msg = data.message;
@@ -58,7 +58,7 @@ export const PostContextProvider = ({ children }) => {
     async function addComment(id, comment, setComment, setShow) {
         let msg;
         try {
-            const { data } = await axios.post('http://localhost:3000/api/post/comment/' + id, { comment }, {
+            const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/api/post/comment/${id}`, { comment }, {
                 withCredentials: true
             })
             msg = "Comment added (placeholder)";
@@ -76,7 +76,7 @@ export const PostContextProvider = ({ children }) => {
         setAddLoading(true);
         try {
             const { data } = await axios.post(
-                'http://localhost:3000/api/post/new?type=' + type,
+                `${import.meta.env.VITE_API_URL}/api/post/new?type=${type}`,
                 formData,
                 { withCredentials: true }
             );
@@ -95,7 +95,7 @@ export const PostContextProvider = ({ children }) => {
 
     async function deletePost(id) {
         try {
-            const { data } = await axios.delete("http://localhost:3000/api/post/" + id, {
+            const { data } = await axios.delete(`${import.meta.env.VITE_API_URL}/api/post/${id}`, {
                 withCredentials: true
             });
             fetchPosts();
@@ -108,7 +108,7 @@ export const PostContextProvider = ({ children }) => {
 
     async function deleteComment(id, commentId) {
         try {
-            const { data } = await axios.delete("http://localhost:3000/api/post/comment/" + id, {
+            const { data } = await axios.delete(`${import.meta.env.VITE_API_URL}/api/post/comment/${id}`, {
                 data: { commentId },
                 withCredentials: true
             });
@@ -121,7 +121,7 @@ export const PostContextProvider = ({ children }) => {
 
     async function editPost(id, caption) {
         try {
-            const { data } = await axios.put("http://localhost:3000/api/post/" + id, { caption: caption }, {
+            const { data } = await axios.put(`${import.meta.env.VITE_API_URL}/api/post/${id}`, { caption: caption }, {
                 withCredentials: true
             })
             fetchPosts();

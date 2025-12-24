@@ -13,7 +13,7 @@ const MessageContainer = ({ selectedChat, setChats }) => {
         setLoading(true);
         try {
             const { data } = await axios.get(
-                'http://localhost:3000/api/message/' + selectedChat.users[0]._id,
+                `${import.meta.env.VITE_API_URL}/api/message/${selectedChat.users[0]._id}`,
                 { withCredentials: true }
             );
             setMessages(data.msg);

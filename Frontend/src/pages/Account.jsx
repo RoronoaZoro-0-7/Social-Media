@@ -32,7 +32,7 @@ const Account = ({ user }) => {
 
     async function followData() {
         try {
-            const { data } = await axios.post('http://localhost:3000/api/user/followdata/' + user._id, {}, {
+            const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/api/user/followdata/${user._id}`, {}, {
                 withCredentials: true
             });
             setFollowersData(data.followers);

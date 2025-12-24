@@ -9,7 +9,7 @@ export const ChatContextProvider = ({ children }) => {
 
     async function createChat(id) {
         try {
-            const { data } = await axios.post('http://localhost:3000/api/messages', {
+            const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/api/messages`, {
                 receiverId: id,
                 message: "Hi"
             }, {
