@@ -3,14 +3,20 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-mongoose.connect(process.env.MONGO_URL);
-mongoose.connection.on("error", (err) => {
-    console.log("Mongoose connection error : " + err);
-    process.exit(1);
-});
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URL, {
+      tls: true,
+      serverSelectionTimeoutMS: 5000,
+    });
 
-mongoose.connection.on("connected", () => {
-    console.log("Mongoose is connected : "+ process.env.MONGO_URL);
-});
+    console.log("MongoDB connected");
+  } catch (err) {
+    console.error("Mongoose connection error:", err.message);
+    process.exit(1);
+  }
+};
+
+connectDB();
 
 export default mongoose;
